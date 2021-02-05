@@ -1,5 +1,5 @@
 var routes = [
-	{path: "/api/danhsachphieuyeucau", controller: "api/CardsRequirementController"},
+	{path: "/api/danhsachphieuyeucau", controller: "CardsRequirementController"},
 ];
 
 exports.activate = function(app){

@@ -1,40 +1,25 @@
-const fs = require('fs')
 const express = require("express");
 const router = express.Router({ mergeParams: true });
-const jwt = require('jsonwebtoken');
-const config = require('../config/config');
-const middleware = require('../lib/middelware');
-const utils = require("../lib/utils");
-const userdb = JSON.parse(fs.readFileSync('./config/fake-data/users.json', 'UTF-8'))
-
+const sql = require("../lib/DB");
 router
-	.route("/login")
-		.post(async (req, res) => {
-      console.log(req.body)
-      console.log("login endpoint called; request body:");
-      if(!req.body.email || !req.body.password) return utils.sendErrorStatus(res, "We've encountered an issue. Please try again.");
-      
-      const {email, password} = req.body;
-      if (isAuthenticated({email, password}) === false) {
-        const status = 401
-        const message = 'Incorrect email or password'
-        res.status(status).json({status, message})
-        return
-      }
-      const access_token = createToken({email, password})
-      console.log("Access Token:" + access_token);
-      res.status(200).json({access_token})
+	.route("/")
+		.get(async (req, res) => {
+        let pool= await sql;
+        let data = req.query;
+        try{
+          let result1 = await new pool.Request()
+          .input('FromDate', sql.DateTime, data.FromDate)
+          .input('ToDate', sql.DateTime, data.ToDate)
+          .input('OrganizationCode', sql.VarChar(50), data.OrganizationCode)
+          .input('Ma', sql.Int, data.Ma)
+          .input('LoaiDichVu', sql.VarChar(50), data.LoaiDichVu)
+          .input('PageNumber', sql.Int, data.PageNumber ?data.PageNumber :1)
+          .input('RowsPerPage', sql.Int, data.RowsPerPage ? data.RowsPerPage : 10)
+          .execute('DanhSachPhieuYeuCau_ECP');
+        res.status(200).json({ status: 1, data: result1.recordsets })
+        }catch(err){
+          err.status = 0;
+          res.status(400).json(err)
+        }
     })
-  // Check if the user exists in database
-    const isAuthenticated=async({email, password})=>{
-      return await userdb.users.findIndex(user => user.email === email && user.password === password) !== -1
-    }	
-  // Verify the token 
-  const verifyToken =  (token)=>{
-  return  jwt.verify(token, config.secret, (err, decode) => decode !== undefined ?  decode : err)
-    }
-  // Create a token from a payload 
-  const createToken=  (payload) =>{
-    return  jwt.sign(payload, config.secret, {expiresIn:config.expiresIn})
-  }
 module.exports = router;

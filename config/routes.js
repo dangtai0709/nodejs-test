@@ -1,4 +1,5 @@
 var routes = [
+	{path: "/api/", controller: "LoginController"},
 	{path: "/api/danhsachphieuyeucau", controller: "CardsRequirementController"},
 ];
 

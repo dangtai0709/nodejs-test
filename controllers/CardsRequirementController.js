@@ -1,9 +1,11 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
 const sql = require("../lib/DB");
+const middleware = require("../lib/middelware");
+
 router
 	.route("/")
-		.get(async (req, res) => {
+		.get(middleware.authenticate.user,async (req, res) => {
         let pool= await sql;
         let data = req.query;
         try{

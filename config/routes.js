@@ -1,6 +1,7 @@
 var routes = [
 	{path: "/api/", controller: "LoginController"},
 	{path: "/api/danhsachphieuyeucau", controller: "CardsRequirementController"},
+	{path: "/api/notification/user", controller: "UserNotificationController"},
 ];
 
 exports.activate = function(app){
